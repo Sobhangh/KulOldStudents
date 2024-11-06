@@ -1,0 +1,31 @@
+Modification to data:
+changing date like 00/00/xxxx to 01/06/xxxx
+and 00/xx/xxxx to 15/xx/xxxx
+removing ,at the end
+
+Created index on voorname, namm , datum eg:
+CREATE INDEX kulfamname_idx ON students(Naam);
+
+The index improvement: 
+Following without index:
+
+USE kulstudents;
+SELECT *
+FROM students
+WHERE Datum_Inschrijving BETWEEN '1300-01-01' AND '1600-01-31';
+
+It took 0.156 sec
+
+USE kulstudents;
+
+SELECT *
+FROM students
+WHERE Voornaam like 'Jo%';
+
+It took 0.203 sec
+
+SELECT *
+FROM students
+WHERE Voornaam like 'Jo%' AND Datum_Inschrijving BETWEEN '1300-01-01' AND '1600-01-31';
+
+It took 0.187 sec
