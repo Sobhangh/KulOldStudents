@@ -51,6 +51,103 @@
     </form>
 
     <?php
+
+        function parse_string_fields(&$params,$content, $db_field, $field){
+            $result = '(';
+            $clen = strlen($content);
+            $i = 0;
+            $highlight_begin = -1;
+            $highlight = $pending_not = $not_state = $and_state = $or_state = $para_state= false;
+            while ($i < $clen){
+                //setting the states
+                if($highlight){
+                    if(substr($content,$i+1,5) == ' NOT '){
+                        $highlight = false;
+                    }
+                    else if(substr($content,$i+1,5) == ' AND '){
+                        $highlight = false;
+                    }
+                    else if(substr($content,$i+1,4) == ' OR '){
+                        $highlight = false;
+                    }
+                    else if(substr($content,$i+1,1) == ')' || substr($content,$i+1,1) == '('){
+                        $highlight = false;
+                    }
+                }
+                else{
+                    if(substr($content,$i,4) == 'NOT '){
+                        $not_state = true;
+                    }
+                    else if(substr($content,$i,4) == 'AND '){
+                        $and_state = true;
+                    }
+                    else if(substr($content,$i,3) == 'OR '){
+                        $or_state = true;
+                    }
+                    else if(substr($content,$i,1) == ')' || substr($content,$i,1) == '('){
+                        $para_state = true;
+                    }
+                    else if($content[$i] != ' '){
+                        $highlight_begin = $i;
+                        $highlight = true;
+                    }
+                }
+                /*if($not_state || $and_state || $or_state || $para_state){
+                    $highlight = false;
+                }*/
+
+                if(!$highlight && $highlight_begin != -1){
+                    $word = substr($content,$highlight_begin,$i-$highlight_begin+1);
+                    $params[$field.$i] = $word;
+                    $result .= $db_field;
+                    if($pending_not){
+                        $result .= ' NOT';
+                        $pending_not = false;
+                    }
+                    $result .= ' LIKE :'.$field.$i;
+                    $i++;
+                    $highlight_begin = -1;
+                }
+                else if($not_state){
+                    //expressions like NOT (firstname LIKE 'a' AND name LIKE 'b') are not allowed
+                    $pending_not = true;
+                    $not_state = false;
+                    $i+=4;
+                }
+                else if($and_state){  
+                    $result .= ' AND ';
+                    $and_state = false;
+                    $i+=4;
+                }
+                else if($or_state){
+                    $result .= ' OR ';
+                    $or_state = false;
+                    $i+=3;
+                }
+                else if($para_state){
+                    $result .= $content[$i];
+                    $para_state = false;
+                    $i++;
+                }
+                else{
+                    $i++;
+                }
+            }
+            if($highlight_begin != -1){
+                $word = substr($content,$highlight_begin,$i-$highlight_begin+1);
+                $params[$field.$i] = $word;
+                $result .= ' '.$db_field;
+                if($pending_not){
+                    $result .= ' NOT';
+                    $pending_not = false;
+                }
+                $result .= ' LIKE :'.$field.$i;
+            }
+            $result .= ')';
+            return $result;
+
+        }
+
     if ($_SERVER["REQUEST_METHOD"] == "GET" && !empty($_GET)) {
         $conn = new PDO("mysql:host=localhost;dbname=kulstudents", "root", "");
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -67,9 +164,10 @@
 
         foreach ($string_fields as $field => $db_field) {
             if (!empty($_GET[$field])) {
-                $where_conditions[] = "($db_field LIKE :$field)";
+                //$where_conditions[] = "($db_field LIKE :$field)";
+                $where_conditions[] = parse_string_fields($params,$_GET[$field],$db_field,$field);
                 //TODO: what about and or not 
-                $params[$field] = $_GET[$field];
+                //$params[$field] = $_GET[$field];
             }
         }
 
@@ -135,6 +233,7 @@
 
         $stmt = $conn->prepare($query);
         //var_dump($stmt);
+        //echo "<br>";
         //var_dump($params);
         //echo "<br>";
         $stmt->execute($params);
