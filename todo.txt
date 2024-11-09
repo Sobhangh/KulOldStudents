@@ -1,0 +1,2 @@
+-Making the first row of the table separate from the rest
+-Adding other fields to the search form like bisdom and actual origin

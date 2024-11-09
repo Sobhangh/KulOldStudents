@@ -1,3 +1,21 @@
+<?php
+session_start();
+
+// Move the graph generation code to the top, before any HTML output
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['get-graph'])) {
+    $timestamp = time();
+    $filename = "graphs/graph_{$timestamp}.png";
+    $csv_filename = $_SESSION['csv_filename'];
+    $python_path = __DIR__ . "/generate_graph.py";
+    
+    exec("python {$python_path} {$filename} {$csv_filename}");
+    
+    header('Content-Type: image/png');
+    header('Content-Disposition: attachment; filename="graph.png"');
+    readfile($filename);
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -333,9 +351,35 @@
             $stmt->execute($params);
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-        
-
+            // Start background process to save CSV
             if ($results) {
+                // Generate unique ID for this export
+                $temp_id = uniqid();
+          
+                // Start background process
+                //$php_path = __DIR__ . "/export_csv.php";
+                $csv_file =  "./tmp/export_{$temp_id}.csv";
+                
+                // Write headers and first batch of data
+                $fp = fopen($csv_file, "w");
+                fputcsv($fp, ['Voornaam', 'Naam', 'Herkomst', 'Herkomst_actuele_Schrijfwijze', 'Bisdom', 'Datum_Inschrijving']);
+                foreach ($results as $row) {
+                    fputcsv($fp, [
+                        $row['Voornaam'],
+                        $row['Naam'],
+                        $row['Herkomst'],
+                        $row['Herkomst_actuele_Schrijfwijze'],
+                        $row['Bisdom'],
+                        $row['Datum_Inschrijving']
+                    ]);
+                }
+                fclose($fp);
+                
+                // Store file info in session
+                //$_SESSION['pending_csv'] = false;
+                $_SESSION['csv_filename'] = $csv_file;
+                
+                // Continue with displaying results
                 echo '<div class="result-table">';
                 echo '<table>';
                 echo '<tr>';
@@ -359,6 +403,29 @@
                 }
                 echo '</table>';
                 echo '</div>';
+                
+                // Add download button after the table
+                echo '<div style="text-align: center; margin-top: 20px;">';
+                echo '<button onclick="downloadGraph()" class="submit-button" style="margin-bottom: 20px;">Download Graph</button>';
+                echo '</div>';
+                
+                // Add JavaScript function for the download
+                echo '<script>
+                    function downloadGraph() {
+                        fetch("?get-graph=true")
+                            .then(response => response.blob())
+                            .then(blob => {
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement("a");
+                                a.href = url;
+                                a.download = "graph.png";
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                window.URL.revokeObjectURL(url);
+                            });
+                    }
+                </script>';
             } else {
                 echo '<p>No results found.</p>';
             }
