@@ -51,13 +51,13 @@ city_coords = get_city_coordinates_from_files()
 plt.figure(figsize=(50, 50))
 
 # Load world map and filter for Western Europe
-world = gpd.read_file("geomap/ne_110m_admin_0_countries.shp")
-print("world columns: ....................")
-print(world.columns)
+world = gpd.read_file("geomap/medium_quality/ne_50m_admin_0_countries.shp")  # Medium resolution (1:50 million)
+#print("world columns: ....................")
+#print(world.columns)
 western_europe = world[world['NAME'].isin(['Netherlands', 'Belgium', 'France', 'Germany', 'Luxembourg'])]
 
 # Plot the map
-ax = western_europe.plot(ax=plt.gca(), color='lightgrey')
+ax = western_europe.plot(ax=plt.gca(), color='whitesmoke')
 
 # Set map boundaries (adjust these coordinates as needed)
 plt.xlim([-5, 15])  # longitude

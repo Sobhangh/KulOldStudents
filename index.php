@@ -2,12 +2,19 @@
 session_start();
 
 // Move the graph generation code to the top, before any HTML output
-if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['get-graph'])) {
+if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($_GET['get-map']))) {
     $timestamp = time();
-    $filename = "graphs/graph_{$timestamp}.png";
+    $filename = "";
+    $python_path = "";
+    if (isset($_GET['get-graph'])){
+        $filename = "graphs/graph_{$timestamp}.png";
+        $python_path = __DIR__ . "/generate_graph.py";
+    }
+    else if (isset($_GET['get-map'])){
+        $filename = "graphs/map_{$timestamp}.png";
+        $python_path = __DIR__ . "/map.py";
+    }
     $csv_filename = $_SESSION['csv_filename'];
-    $python_path = __DIR__ . "/generate_graph.py";
-    
     exec("python {$python_path} {$filename} {$csv_filename}");
     
     header('Content-Type: image/png');
@@ -405,16 +412,38 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['get-graph'])) {
                 echo '</div>';
                 
                 // Add download button after the table
+                echo '<p style="text-align: center;display:none" id="graph-status"> Genrating graphs please wait </p>';
                 echo '<div style="text-align: center; margin-top: 20px;">';
-                echo '<button onclick="downloadGraph()" class="submit-button" style="margin-bottom: 20px;">Download Graph</button>';
+                echo '<button onclick="downloadGraph(\'?get-graph=true\')" class="submit-button" style="margin-bottom: 20px; margin-right: 20px;">Download Temporal Distribution</button>';
+                echo '<button onclick="downloadGraph(\'?get-map=true\')" class="submit-button" style="margin-bottom: 20px;">Download Spatial Distribution</button>';
                 echo '</div>';
+                
                 
                 // Add JavaScript function for the download
                 echo '<script>
-                    function downloadGraph() {
-                        fetch("?get-graph=true")
+                    let i = 0;
+                    let intervalId; 
+                    function showStatus(){
+                        document.getElementById("graph-status").style.display = "block";
+                        i = 0;
+                        intervalId = setInterval(function(){ 
+                            if(i <= 5){
+                                i++;
+                                document.getElementById("graph-status").innerHTML += "."; // Yes, += works for strings in JS
+                            }
+                            else{
+                                i = 0;
+                                document.getElementById("graph-status").innerHTML = "Generating graphs please wait";
+                            }
+                        }, 500);
+                    }
+                    function downloadGraph(url) {
+                        showStatus();
+                        fetch(url)
                             .then(response => response.blob())
                             .then(blob => {
+                                clearInterval(intervalId); // Stop the interval when download is complete
+                                document.getElementById("graph-status").style.display = "none";
                                 const url = window.URL.createObjectURL(blob);
                                 const a = document.createElement("a");
                                 a.href = url;
