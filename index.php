@@ -155,6 +155,14 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
                 <input type="text" id="origin" name="origin" class="form-input" placeholder="Same format as First name">
             </div>
             <div class="form-group">
+                <label for="origin_current" class="form-label">Origin current name:</label>
+                <input type="text" id="origin_current" name="origin_current" class="form-input" placeholder="Same format as First name">
+            </div>
+            <div class="form-group">
+                <label for="bisdom" class="form-label">Bisdom:</label>
+                <input type="text" id="bisdom" name="bisdom" class="form-input" placeholder="Same format as First name">
+            </div>
+            <div class="form-group">
                 <label for="datefrom" class="form-label">Date from:</label>
                 <input type="text" id="datefrom" name="datefrom" class="form-input" placeholder="Date format: YEAR-MONTH-DAY; If empty means open ended; put * if the same as the other date field">
             </div>
@@ -268,7 +276,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
             }
 
         if ($_SERVER["REQUEST_METHOD"] == "GET" && !empty($_GET)) {
-            $conn = new PDO("mysql:host=localhost;dbname=kulstudents", "root", "");
+            $conn = new PDO("mysql:host=localhost;dbname=kuloldstudents", "root", "");
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             $where_conditions = [];
@@ -278,7 +286,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
             $string_fields = [
                 'firstname' => 'Voornaam',
                 'name' => 'Naam',
-                'origin' => 'Herkomst'
+                'origin' => 'Herkomst',
+                'origin_current' => 'Herkomst_actuele_Schrijfwijze',
+                'bisdom' => 'Bisdom'
             ];
 
             foreach ($string_fields as $field => $db_field) {
@@ -325,6 +335,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
                     'First name' => 'Voornaam',
                     'Name' => 'Naam',
                     'Origin' => 'Herkomst',
+                    'Origin current name' => 'Herkomst_actuele_Schrijfwijze',
+                    'Bisdom' => 'Bisdom',
                     'Date' => 'Datum_Inschrijving'
                 ];
                 

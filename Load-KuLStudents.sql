@@ -1,5 +1,9 @@
 -- Step 1: Use the specified database
-USE kulstudents;
+CREATE DATABASE IF NOT EXISTS kuloldstudents
+CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE kuloldstudents;
+
 
 -- Step 2: Create a temporary table with VARCHAR for the date column and utf8mb4 encoding
 CREATE TABLE IF NOT EXISTS temp_students (
