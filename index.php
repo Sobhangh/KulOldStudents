@@ -46,69 +46,25 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
             z-index: 100;
         }
         .content-wrapper {
-            padding-top: 70px; /* Adjust this value based on your header height */
-        }
-        form {
-            border-width: 4px;
-            border-style: solid;
-            border-color: blue;
-            border-radius: 5px;
-        }
-        .result-table {
-            height: 400px;
-            overflow-y: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-        .sticky-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background-color: blue;
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 10px 0;
-            z-index: 100;
-        }
-        .content-wrapper {
             padding-top: 70px;
         }
         form {
             border-width: 4px;
             border-style: solid;
             border-color: blue;
-            border-radius: 5px;
+            border-radius: 3px;
             width: 80%;
             margin: 0 auto;
-            margin-bottom: 20px;
             padding: 20px;
         }
         .result-table {
+            margin-left: 5%;
             margin-top: 20px;
             height: 400px;
             overflow-y: auto;
         }
         table {
-            width: 100%;
+            width: 95%;
             border-collapse: collapse;
         }
         th, td {
@@ -125,6 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
         .form-label {
             display: block;
             margin-bottom: 5px;
+            color: blue;
         }
         .form-input {
             width: 95%;
@@ -135,6 +92,27 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
+            background-color: white;
+            color: blue;
+            border: 2px solid blue;
+            transition: all 0.3s ease;
+        }
+        .submit-button:hover {
+            background-color: blue;
+            color: white;
+        }
+        .footer {
+            background-color: blue;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: 50px;
+        }
+        .footer p {
+            margin: 5px 0;
         }
     </style>
 </head>
@@ -473,6 +451,10 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
         }
         ?>
     </div>
+    <footer class="footer">
+        <p>© 2024 Student Search Database</p>
+        <p>KU Leuven - All Rights Reserved</p>
+    </footer>
 </body>
 </html>
 
