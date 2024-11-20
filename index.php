@@ -44,6 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
             margin: 0;
             padding: 10px 0;
             z-index: 100;
+            font-size: larger;
         }
         .content-wrapper {
             padding-top: 70px;
@@ -59,12 +60,13 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
         }
         .result-table {
             margin-left: 5%;
+            margin-right: 5%;
             margin-top: 20px;
             height: 400px;
             overflow-y: auto;
         }
         table {
-            width: 95%;
+            width: 100%;
             border-collapse: collapse;
         }
         th, td {
@@ -105,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && (isset($_GET['get-graph']) || isset($
             background-color: blue;
             color: white;
             text-align: center;
-            padding: 15px 0;
+            padding: 10px 0;
             position: relative;
             bottom: 0;
             width: 100%;
